@@ -1,20 +1,30 @@
 import pygame
+import queue
 
 def main():
+
+    # Initialize Pygame
     pygame.display.init()
+
+    # Initialize the Clock
     clock = pygame.time.Clock()
 
+    # Set the dimensions of the window
     windowWidth = 800
     windowHeight = 600
 
+    # Create the window
     window = pygame.display.set_mode((windowWidth, windowHeight))
-    pygame.display.set_caption("Drawing Program")
 
+    # Set the window caption and window color
+    pygame.display.set_caption("Drawing Program")
     windowColor = [255, 255, 255]
     window.fill(windowColor)
 
+    # Update the window
     pygame.display.update()
 
+    # Print the menu for the User
     print("---------------------------")
     print("Drawing Program")
     print("Red    - 1")
@@ -29,139 +39,206 @@ def main():
     print("Black  - 0")
     
     print("\n" + "Fill   - F")
+    print("Paint  - P")
     print("Increase Size - Plus")
     print("Decrease Size - Minus")
 
     print("\n" + "Quit   - Escape")
     print("---------------------------")
 
-    running = True
-    mouseColor = [0, 0, 0]
-    mouseSize = 1
+    # Initialize running, brushColor, and brushSize
+    running = True                          # Run the program while True, stop the program while False
+    brushColor = pygame.Color(0, 0, 0, 255) # brushColor affects the color of the paint
+    brushSize = 1                           # brushSize affects the size of the brush
+    brushMode = "paint"
+
+    # While running is True...
     while running:
+
+        # ... get an event...
         for event in pygame.event.get():
+
+            # ... if the event is a key press...
             if event.type == pygame.KEYDOWN:
+                print(event.key)
+
+                # ... check if the key pressed is...
                 match event.key:
-                    
                     # Escape
                     case 27:
-                        pygame.quit()
+                        # Stop the game
+                        running = False
 
                     # Minus
                     case 45:
-                        mouseSize -= 10
-                        if mouseSize < 1:
-                            mouseSize = 1
-                        print("Size: " + str(mouseSize))
+                        
+                        # Decrease the size of the brush
+                        brushSize -= 10
+
+                        # Prevent the brush size from getting too small
+                        if brushSize < 1:
+                            brushSize = 1
+
+                        # Inform the user of the new brush size
+                        print("Size: " + str(brushSize))
                         
                     # 0
                     case 48:
-                        mouseColor = "black"
+
+                        # Set the paint to be Black
+                        brushColor = pygame.Color("Black")
                         print("Color: Black")
                         
                     # 1
                     case 49:
-                        mouseColor = "red"
+
+                        # Set the paint to be Red
+                        brushColor = pygame.Color("Red")
                         print("Color: Red")
 
                     # 2
                     case 50:
-                        mouseColor = "orange"
+
+                        # Set the paint to be Orange
+                        brushColor = pygame.Color("Orange")
                         print("Color: Orange")
 
                     # 3
                     case 51:
-                        mouseColor = "yellow"
+
+                        # Set the paint to be Yellow
+                        brushColor = pygame.Color("Yellow")
                         print("Color: Yellow")
 
                     # 4
                     case 52:
-                        mouseColor = "green"
+
+                        # Set the paint to be Green
+                        brushColor = pygame.Color("Green")
                         print("Color: Green")
 
                     # 5
                     case 53:
-                        mouseColor = "blue"
+
+                        # Set the paint to be Blue
+                        brushColor = pygame.Color("Blue")
                         print("Color: Blue")
 
                     # 6
                     case 54:
-                        mouseColor = "purple"
+
+                        # Set the paint to be Purple
+                        brushColor = pygame.Color("Purple")
                         print("Color: Purple")
 
                     # 7
                     case 55:
-                        mouseColor = "cyan"
+
+                        # Set the paint to be Cyan
+                        brushColor = pygame.Color("Cyan")
                         print("Color: Cyan")
 
                     # 8
                     case 56:
-                        mouseColor = "pink"
+
+                        # Set the paint to be Pink
+                        brushColor = pygame.Color("Pink")
                         print("Color: Pink")
 
                     # 9
                     case 57:
-                        mouseColor = "white"
+
+                        # Set the paint to be White
+                        brushColor = pygame.Color("White")
                         print("Color: White")
 
                     # Plus
                     case 61:
-                        mouseSize += 10
-                        if mouseSize > 100:
-                            mouseSize = 100
-                        print("Size: " + str(mouseSize))
+
+                        # Increase the size of the brush
+                        brushSize += 10
+
+                        # Prevent the brush from getting too big
+                        if brushSize > 100:
+                            brushSize = 100
+
+                        # Inform the user of the new brush size
+                        print("Size: " + str(brushSize))
 
                     # F
                     case 102:
-                        window.fill(mouseColor)
+                        print("Fill mode")
+                        brushMode = "fill"
 
-                        
-
-                """
-                if event.key == pygame.K_0:
-                    mouseColor = "black"
-                elif event.key == pygame.K_1:
-                    mouseColor = "red"
-                elif event.key == pygame.K_2:
-                    mouseColor = "orange"
-                elif event.key == pygame.K_3:
-                    mouseColor = "yellow"
-                elif event.key == pygame.K_4:
-                    mouseColor = "green"
-                elif event.key == pygame.K_5:
-                    mouseColor = "blue"
-                elif event.key == pygame.K_6:
-                    mouseColor = "purple"
-                elif event.key == pygame.K_7:
-                    mouseColor = "cyan"
-                elif event.key == pygame.K_8:
-                    mouseColor = "pink"
-                elif event.key == pygame.K_9:
-                    mouseColor = "white"
+                    # P
+                    case 112:
+                        print("Paint mode")
+                        brushMode = "paint"
                     
-                elif event.key == pygame.K_f:
-                    window.fill(mouseColor)
 
-                elif event.key == pygame.K_PLUS or event.key == pygame.K_KP_PLUS:
-                    mouseSize += 10
-
-                elif event.key == pygame.K_MINUS or event.key == pygame.K_KP_MINUS:
-                    mouseSize -= 10
-                    if mouseSize < 1:
-                        mouseSize = 1
-                    
-                elif event.key == pygame.K_ESCAPE:
-                    pygame.quit()
-                """
-
-            # Left-click
+            # ... if the event is a left-mouse click...
             if pygame.mouse.get_pressed()[0]:
+
+                # ... get the Position of the mouse
                 mousePos = pygame.mouse.get_pos()
+
                 mouseX = mousePos[0]
                 mouseY = mousePos[1]
-                pygame.draw.circle(window, mouseColor, mousePos, mouseSize)
 
+                if brushMode == "paint":
+
+                    # Draw a circle on the window
+                    # Set the circle's color to brushColor
+                    # Draw the circle at the mouse's position
+                    # Set the circle's size to brushSize
+                    pygame.draw.circle(window, brushColor, mousePos, brushSize)
+
+                if brushMode == "fill":
+
+                    colorPicked = window.get_at(mousePos)
+                    if colorPicked != brushColor:
+
+                        pixelQueue = []
+                        pixelQueue.append(mousePos)
+
+                        while pixelQueue:
+                            pixel = pixelQueue.pop(0)
+                            #print(pixel)
+                            window.set_at(pixel, brushColor)
+
+                            # North Pixel
+                            northPixel = (pixel[0], pixel[1] - 1)
+                            if northPixel[1] >= 0:
+                                if window.get_at(northPixel) == colorPicked:
+                                    window.set_at(northPixel, brushColor)
+                                    pixelQueue.append(northPixel)
+
+                            # East Pixel
+                            eastPixel = (pixel[0] + 1, pixel[1])
+                            if eastPixel[0] < windowWidth:
+                                if window.get_at(eastPixel) == colorPicked:
+                                    window.set_at(eastPixel, brushColor)
+                                    pixelQueue.append(eastPixel)
+
+                            # South Pixel
+                            southPixel = (pixel[0], pixel[1] + 1)
+                            if southPixel[1] < windowHeight:
+                                if window.get_at(southPixel) == colorPicked:
+                                    window.set_at(southPixel, brushColor)
+                                    pixelQueue.append(southPixel)
+
+                            # West Pixel
+                            westPixel = (pixel[0] - 1, pixel[1])
+                            if westPixel[0] >= 0:
+                                if window.get_at(westPixel) == colorPicked:
+                                    window.set_at(westPixel, brushColor)
+                                    pixelQueue.append(westPixel)
+   
+        # Update the window
         pygame.display.update()
+
+    # Quit out of the game
+    pygame.quit()
 
 main()
     
